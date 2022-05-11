@@ -57,7 +57,7 @@ External services:
 - PaymentSystem (sync communication ?)
 - NotificationSystem (sync communication)
 
-![[rev1_dles.png]]
+![rev1_dles.png](media/rev1_dles.png)
 
 # Business Events
 
