@@ -1,2 +1,2 @@
 # Before everything
-![[architecture_rev0.png]]
+![architecture_rev0.png](media/architecture_rev0.png)
