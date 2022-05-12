@@ -2,5 +2,19 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require_relative "config/application"
+require "annotate"
+require "pry"
 
 Rails.application.load_tasks
+
+begin
+  require "annotate"
+  Annotate.set_defaults(
+    position_in_class: :after,
+    position_in_serializer: :after,
+    exclude_tests: true,
+    exclude_fixtures: true
+  )
+  Annotate.load_tasks
+rescue LoadError
+end

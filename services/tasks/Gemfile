@@ -48,6 +48,13 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+gem "bunny"
+gem "sneakers"
+gem "omniauth"
+gem "omniauth-oauth2"
+gem 'omniauth-rails_csrf_protection'
+gem 'devise', git: 'https://github.com/heartcombo/devise' # https://github.com/heartcombo/devise/issues/5431
+
 group :development, :test do
   gem "ruby-debug-ide"
   gem "debase"
@@ -56,9 +63,14 @@ group :development, :test do
   gem "rubocop"
   gem "rubocop-rspec"
   gem "factory_bot"
+  gem "net-http"
+  gem "pry"
+  gem 'dotenv'
 end
 
 group :development do
+  gem "annotate"
+
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 
