@@ -1,0 +1,51 @@
+<div class="container">
+  <h1>Popug Tasks Tracker</h1>
+</div>
+<div name="managementActions" class="container">
+  <h2>For management</h2>
+  <p>
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#newTask" role="button" aria-expanded="false" aria-controls="newTask">
+      Add New Tasks
+    </a>
+  </p>
+  <div class="collapse" id="newTask">
+  <%= form_with model: @new_task do |form| %>
+    <div>
+      <%= form.label :description %>
+      <%= form.text_field :description %>
+      <%= form.submit %>
+    </div>
+  <% end %>
+  </div>
+  <form action="/shuffle" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+    <input type="hidden" name="_method" value="patch">
+    <input type="submit" name="submit" value="Shuffle" class="btn btn-primary">
+  </form>
+</div>
+<div name="viewer" class="container">
+  <h1>Open Tasks</h1>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Task Description</th>
+      <th scope="col">Assignee</th>
+      <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @tasks.each_with_index do |task, i| %>
+      <tr>
+        <th scope="row"><%= i+1 %></th>
+        <td><%= task.description %></td>
+        <td><%= task.assignee.name %></td>
+        <td><%= link_to "Complete", "/task/#{task.id}", data: {turbo_method: :patch}  %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="container">
+  <%= link_to "Sign in with aa_auth", user_aa_auth_omniauth_authorize_path, method: :post, data: { turbolinks: false } %>
+</div>

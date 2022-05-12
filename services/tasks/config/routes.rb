@@ -1,6 +1,14 @@
-Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+# frozen_string_literal: true
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+Rails.application.routes.draw do
+  devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
+
+  get 'sessions/new'
+  get 'sessions/create'
+  get 'sessions/failure'
+  root to: "tasks#index"
+  get '/tasks', to: 'tasks#index'
+  post '/', to: 'tasks#create'
+  patch '/shuffle', to: 'tasks#shuffle'
+  patch '/task/:id', to: 'tasks#complete'
 end
