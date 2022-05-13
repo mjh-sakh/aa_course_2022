@@ -12,8 +12,8 @@ module OmniAuth
       option :name, :aa_auth
 
       option :client_options, {
-          :site => 'http://0.0.0.0:3001/oauth/authorize',
-          :authorize_url => 'http://0.0.0.0:3001/oauth/authorize'
+          :site => 'http://0.0.0.0:3001',
+          :authorize_url => 'http://0.0.0.0:3001/oauth/authorize',
       }
 
       def request_phase

@@ -10,7 +10,7 @@ Doorkeeper.configure do
     # raise "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
-    Account.find_by(id: session['warden.user.account.key'].first.first) || redirect_to(new_account_session_path)
+    Account.find_by(id: session['warden.user.account.key']&.first&.first) || redirect_to(new_account_session_path)
   end
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb
@@ -227,7 +227,7 @@ Doorkeeper.configure do
   # For more information go to
   # https://doorkeeper.gitbook.io/guides/ruby-on-rails/scopes
   #
-  # default_scopes  :public
+  default_scopes  :public
   # optional_scopes :write, :update
 
   # Allows to restrict only certain scopes for grant_type.

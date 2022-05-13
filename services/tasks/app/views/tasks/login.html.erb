@@ -1,0 +1,7 @@
+<div class="container-sm">
+  <h1>Please log in</h1>
+  <form data-turbo="false" action="<%= user_aa_auth_omniauth_authorize_path %>" accept-charset="UTF-8" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" />
+    <button class="btn btn-primary btn-lg" type='submit'>Login at Popug Auth</button>
+  </form>
+</div>
