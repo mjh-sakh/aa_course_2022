@@ -51,7 +51,6 @@ gem "bootsnap", require: false
 
 gem "bunny"
 gem "sneakers"
-gem 'waterdrop'
 gem 'devise', git: 'https://github.com/heartcombo/devise' # https://github.com/heartcombo/devise/issues/5431
 gem 'doorkeeper'
 
