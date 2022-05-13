@@ -1,8 +1,8 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   # See https://github.com/omniauth/omniauth/wiki/FAQ#rails-session-is-clobbered-after-callback-on-developer-strategy
-  skip_before_action :verify_authenticity_token, only: :oauth2
+  skip_before_action :verify_authenticity_token, only: %i[aa_auth]
 
-  def oauth2
+  def aa_auth
     # You need to implement the method below in your model (e.g. app/models/user.rb)
     user_idx = request.env['omniauth.auth']['info']['id']
     @user = User.find_by(user_idx: user_idx)

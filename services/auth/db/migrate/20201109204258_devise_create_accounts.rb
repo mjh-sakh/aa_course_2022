@@ -17,8 +17,8 @@ class DeviseCreateAccounts < ActiveRecord::Migration[6.0]
       t.boolean   :active, default: true
 
       ## Recoverable
-      t.string   :reset_password_token
-      t.datetime :reset_password_sent_at
+      # t.string   :reset_password_token
+      # t.datetime :reset_password_sent_at
 
       ## Rememberable
       t.datetime :remember_created_at
@@ -46,7 +46,7 @@ class DeviseCreateAccounts < ActiveRecord::Migration[6.0]
     end
 
     add_index :accounts, :email,                unique: true
-    add_index :accounts, :reset_password_token, unique: true
+    # add_index :accounts, :reset_password_token, unique: true
     # add_index :accounts, :confirmation_token,   unique: true
     # add_index :accounts, :unlock_token,         unique: true
   end

@@ -1,7 +1,11 @@
 <div class="container">
   <h1>Popug Tasks Tracker</h1>
+  <div>Hello <%= current_user.name %>!<br/>
+    Your roles: <%= @roles.join(', ') %>.<br/>
+    Your permissions: <%= @permissions.join(', ') %>.</div>
 </div>
 <div name="managementActions" class="container">
+  <% if @permissions.include? 'add_new_task' %>
   <h2>For management</h2>
   <p>
     <a class="btn btn-primary" data-bs-toggle="collapse" href="#newTask" role="button" aria-expanded="false" aria-controls="newTask">
@@ -17,11 +21,14 @@
     </div>
   <% end %>
   </div>
+  <% end %>
+  <% if @permissions.include? 'shuffle_open_tasks' %>
   <form action="/shuffle" method="post">
     <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
     <input type="hidden" name="_method" value="patch">
     <input type="submit" name="submit" value="Shuffle" class="btn btn-primary">
   </form>
+  <% end %>
 </div>
 <div name="viewer" class="container">
   <h1>Open Tasks</h1>
@@ -40,12 +47,15 @@
         <th scope="row"><%= i+1 %></th>
         <td><%= task.description %></td>
         <td><%= task.assignee.name %></td>
-        <td><%= link_to "Complete", "/task/#{task.id}", data: {turbo_method: :patch}  %></td>
+        <td>
+          <% if @permissions.include? 'complete_own_tasks' and task.assignee == current_user %>
+          <%= link_to "Complete", "/task/#{task.id}", data: {turbo_method: :patch}  %>
+          <% else %>
+          Just watch
+          <% end %>
+        </td>
       </tr>
     <% end %>
     </tbody>
   </table>
-</div>
-<div class="container">
-  <%= link_to "Sign in with aa_auth", user_aa_auth_omniauth_authorize_path, method: :post, data: { turbolinks: false } %>
 </div>
