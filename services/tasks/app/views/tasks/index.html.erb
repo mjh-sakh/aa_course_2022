@@ -2,7 +2,8 @@
   <h1>Popug Tasks Tracker</h1>
   <div>Hello <%= current_user.name %>!<br/>
     Your roles: <%= @roles.join(', ') %>.<br/>
-    Your permissions: <%= @permissions.join(', ') %>.</div>
+    Your permissions: <%= @permissions.join(', ') %>.<br/>
+    <%= render 'logout_btn' %></div>
 </div>
 <div name="managementActions" class="container">
   <% if @permissions.include? 'add_new_task' %>
@@ -43,18 +44,20 @@
     </thead>
     <tbody>
     <% @tasks.each_with_index do |task, i| %>
+      <% if (@permissions.include? 'view_own_tasks' and task.assignee == current_user) or @permissions.include? 'view_all_tasks'%>
       <tr>
         <th scope="row"><%= i+1 %></th>
         <td><%= task.description %></td>
         <td><%= task.assignee.name %></td>
         <td>
-          <% if @permissions.include? 'complete_own_tasks' and task.assignee == current_user %>
+          <% if (@permissions.include? 'complete_own_tasks' and task.assignee == current_user) or @permissions.include? 'complete_all_tasks' %>
           <%= link_to "Complete", "/task/#{task.id}", data: {turbo_method: :patch}  %>
           <% else %>
           Just watch
           <% end %>
         </td>
       </tr>
+      <% end %>
     <% end %>
     </tbody>
   </table>

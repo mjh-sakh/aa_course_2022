@@ -11,15 +11,17 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.text_field(:full_name) %>
+  <div class="mb-1">
+    <%= form.label :full_name %><br/>
+    <%= form.text_field :full_name %>
   </div>
 
-  <div>
-    <%= form.select(:role, [['Admin', 'admin'], ['Worker', 'worker'], ['Manager', 'manager']]) %>
+  <div class="mb-3">
+    <%= form.label :role %><br/>
+    <%= form.select :role, [['Admin', 'admin'], ['Worker', 'worker'], ['Manager', 'manager']] %>
   </div>
 
-  <div class="actions">
+  <div class="mb-3">
     <%= form.submit %>
   </div>
 <% end %>

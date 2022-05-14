@@ -11,13 +11,13 @@ class UserUpserter
   #   }
   # }
   def initialize(message)
-    @type = message['type']
+    @message_name = message['message_name']
     @data = message['data']
     @logger = ActiveSupport::Logger.new(STDOUT)
   end
 
   def upsert!
-    case @type
+    case @message_name
     when 'AccountCreated'
       create_user!
     when 'AccountUpdated'
@@ -27,7 +27,7 @@ class UserUpserter
     when 'AccountEnabled'
       activate_user!
     else
-      @logger.info "Ignoring '#{@type}' type message."
+      @logger.info "Ignoring '#{@message_name}' message."
     end
   end
 
@@ -52,7 +52,7 @@ class UserUpserter
     if user.nil?
       @logger.info "User #{@data[:full_name]} is new but updated; user will be created."
       create_user!
-    else
+    elsif user.active?
       ActiveRecord::Base.transaction do
         role.save!
         user.name = @data[:full_name]
@@ -61,6 +61,8 @@ class UserUpserter
         user.save
       end
       @logger.info "User #{user.name} updated."
+    else
+      @logger.info "Ignoring '#{@message_name}' message for user #{user.name} as not active."
     end
   end
 
@@ -69,7 +71,11 @@ class UserUpserter
     if user.nil?
       @logger.info "User with id: #{@data[:id]} is not found; Ignored."
     else
-      user.update(status: :deactivated)
+      ActiveRecord::Base.transaction do
+        user.status = :deactivated
+        user.roles = []
+        user.save!
+      end
       @logger.info "User #{user.name} deactivated."
     end
   end
