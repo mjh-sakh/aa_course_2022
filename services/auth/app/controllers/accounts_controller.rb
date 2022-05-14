@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  ACCOUNTS_TOPIC = 'aa_accounts_stream'
+  ACCOUNTS_TOPIC_CUD = 'aa_accounts_stream'
   
   before_action :set_account, only: [:show, :edit, :update, :destroy, :enable]
 
@@ -30,7 +30,7 @@ class AccountsController < ApplicationController
         # ----------------------------- produce event -----------------------
         message = {
           # **account_event_data,
-          type: 'AccountUpdated',
+          message_name: 'AccountUpdated',
           data: {
             id: @account.id,
             email: @account.email,
@@ -39,7 +39,7 @@ class AccountsController < ApplicationController
             role: @account.role
           }
         }
-        Producer.new.publish(message, topic: ACCOUNTS_TOPIC)
+        Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
         # --------------------------------------------------------------------
 
         produce_business_event(@account.id, new_role) if new_role
@@ -67,7 +67,7 @@ class AccountsController < ApplicationController
       type: 'AccountDeleted',
       data: { id: @account.id }
     }
-    Producer.new.publish(message, topic: ACCOUNTS_TOPIC)
+    Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
     # --------------------------------------------------------------------
 
     respond_to do |format|
@@ -77,6 +77,7 @@ class AccountsController < ApplicationController
   end
 
   # PUT
+  # for education purposes only to play with accounts and messages
   def enable
     @account.update(active: true, disabled_at: nil)
 
@@ -86,7 +87,7 @@ class AccountsController < ApplicationController
       type: 'AccountEnabled',
       data: { id: @account.id }
     }
-    Producer.new.publish(message, topic: ACCOUNTS_TOPIC)
+    Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
     # --------------------------------------------------------------------
 
     respond_to do |format|
@@ -131,7 +132,7 @@ class AccountsController < ApplicationController
       type: 'AccountRoleChanged',
       data: { id: id, role: role }
     }
-    Producer.new.publish(message, topic: ACCOUNTS_TOPIC)
+    Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
     # end
   end
 end
