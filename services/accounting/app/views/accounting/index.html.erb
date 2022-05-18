@@ -1,0 +1,71 @@
+<div class="container">
+  <h1>Accounting</h1>
+  <a class="btn btn-outline-primary" href="<%= analytics_path %>" role="button">Analytics</a>
+  <a class="btn btn-outline-warning" href="<%= calc_payment_path %>" role="button">Close day, calc and make payments</a>
+</div>
+<%= render template: 'common/_user_info' %>
+<% if @current_user_permissions.include? 'view_management_stats' %>
+  <div class="container">
+    <h1>Management stats</h1>
+    <h3>As for now, management balance is <%= @earned_today %>.<br/> Last payment was <%= @last_payment_time %>.</h3>
+    <h2>Audit log</h2>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Record time</th>
+        <th scope="col">Event time</th>
+        <th scope="col">Task description</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Assignee</th>
+        <th scope="col">Note</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @management_records.each_with_index do |record, i| %>
+        <tr>
+          <th scope="row"><%= i+1 %></th>
+          <td><%= record.record_time %></td>
+          <td><%= record.event_time %></td>
+          <td><%= record&.task&.description %></td>
+          <td><%= -record.amount %></td>
+          <td><%= record.user.name %></td>
+          <td><%= record.note %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+<% if @current_user_permissions.include? 'view_worker_stats' %>
+  <div class="container">
+    <h1>Worker stats</h1>
+    <h2>Your balance is <%= @balance %></h2>
+    <h2>Your last payment was <%= @last_payment %></h2>
+    <h2>Audit log</h2>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Record time</th>
+        <th scope="col">Event time</th>
+        <th scope="col">Task description</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Note</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @records.each_with_index do |record, i| %>
+          <tr>
+            <th scope="row"><%= i+1 %></th>
+            <td><%= record.record_time %></td>
+            <td><%= record.event_time %></td>
+            <td><%= record&.task&.description %></td>
+            <td><%= record.amount %></td>
+            <td><%= record.note %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

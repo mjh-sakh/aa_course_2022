@@ -1,34 +1,26 @@
 <div class="container">
   <h1>Popug Tasks Tracker</h1>
-  <div>Hello <%= current_user.name %>!<br/>
-    Your roles: <%= @roles.join(', ') %>.<br/>
-    Your permissions: <%= @permissions.join(', ') %>.<br/>
-    <%= render 'logout_btn' %></div>
+  <a class="btn btn-outline-warning" href="<%= resend_data_path %>" role="button">Resend data</a>
 </div>
+<%= render template: 'common/_user_info' %>
 <div name="managementActions" class="container">
   <% if @permissions.include? 'add_new_task' %>
-  <h2>For management</h2>
-  <p>
-    <a class="btn btn-primary" data-bs-toggle="collapse" href="#newTask" role="button" aria-expanded="false" aria-controls="newTask">
-      Add New Tasks
-    </a>
-  </p>
-  <div class="collapse" id="newTask">
-  <%= form_with model: @new_task do |form| %>
-    <div>
-      <%= form.label :description %>
-      <%= form.text_field :description %>
-      <%= form.submit %>
-    </div>
-  <% end %>
-  </div>
+    <h2>For management</h2>
+    <%= form_with model: @new_task do |form| %>
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button class="btn btn-warning" type="submit">Add new task</button>
+          </span>
+            <input class="form-control" type="text" placeholder="Task description" name="<%= :description %>" id="<%= :description %>">
+        </div>
+      </div>
+    <% end %>
   <% end %>
   <% if @permissions.include? 'shuffle_open_tasks' %>
-  <form action="/shuffle" method="post">
-    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-    <input type="hidden" name="_method" value="patch">
-    <input type="submit" name="submit" value="Shuffle" class="btn btn-primary">
-  </form>
+    <div class="mb-3">
+      <a data-turbo-method="patch" class="btn btn-primary" href="<%= shuffle_path %>" role="button">Shuffle</a>
+    </div>
   <% end %>
 </div>
 <div name="viewer" class="container">
@@ -44,19 +36,19 @@
     </thead>
     <tbody>
     <% @tasks.each_with_index do |task, i| %>
-      <% if (@permissions.include? 'view_own_tasks' and task.assignee == current_user) or @permissions.include? 'view_all_tasks'%>
-      <tr>
-        <th scope="row"><%= i+1 %></th>
-        <td><%= task.description %></td>
-        <td><%= task.assignee.name %></td>
-        <td>
-          <% if (@permissions.include? 'complete_own_tasks' and task.assignee == current_user) or @permissions.include? 'complete_all_tasks' %>
-          <%= link_to "Complete", "/task/#{task.id}", data: {turbo_method: :patch}  %>
-          <% else %>
-          Just watch
-          <% end %>
-        </td>
-      </tr>
+      <% if (@permissions.include? 'view_own_tasks' and task.assignee == current_user) or @permissions.include? 'view_all_tasks' %>
+        <tr>
+          <th scope="row"><%= i + 1 %></th>
+          <td><%= task.description %></td>
+          <td><%= task.assignee.name %></td>
+          <td>
+            <% if (@permissions.include? 'complete_own_tasks' and task.assignee == current_user) or @permissions.include? 'complete_all_tasks' %>
+              <%= link_to "Complete", "/task/#{task.id}", data: { turbo_method: :patch } %>
+            <% else %>
+              Just watch
+            <% end %>
+          </td>
+        </tr>
       <% end %>
     <% end %>
     </tbody>

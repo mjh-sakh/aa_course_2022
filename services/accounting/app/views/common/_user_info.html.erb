@@ -1,0 +1,6 @@
+<div class="container">
+  <div>Hello <%= current_user.name %>!<br/>
+    Your roles: <%= @current_user_roles.join(', ') %>.<br/>
+    Your permissions: <%= @current_user_permissions.join(', ') %>.<br/>
+    <%= render template: 'common/_logout_btn' %></div>
+</div>

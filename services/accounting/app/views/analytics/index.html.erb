@@ -1,0 +1,40 @@
+<div class="container">
+  <h1>Analytics</h1>
+  <a class="btn btn-outline-primary" href="<%= accounting_path %>" role="button">Accounting</a>
+  <a data-turbo-method="patch"class="btn btn-outline-primary" href="<%= recalc_balances_path %>" role="button">Recalc balances</a>
+</div>
+<%= render template: 'common/_user_info' %>
+<div class="container">
+  <h1>Management stats</h1>
+  <h3>As for now, management balance is <%= @earned_today %>.<br/> Last payment was <%= @last_payment_time %>.</h3>
+  <h1>Poor Workers</h1>
+  <ul class="list-group">
+    <% @poor_workers.each do |worker| %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= worker.name %>
+        <span class="badge bg-success rounded-pill"><%= worker.balance %></span>
+      </li>
+    <% end %>
+  </ul>
+  <h1>Most payed tasks</h1>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">Period in hours</th>
+      <th scope="col">Cost</th>
+      <th scope="col">Description</th>
+      <th scope="col">Completed_at</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @most_payed_tasks_per_period.each do |period, reward, description, completed_at| %>
+      <tr>
+        <td><%= period%></td>
+        <td><%= reward %></td>
+        <td><%= description %></td>
+        <td><%= completed_at&.in_time_zone('Asia/Sakhalin') %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,9 +1,9 @@
 class CreateUsersRolesPermissions < ActiveRecord::Migration[7.0]
   def change
     create_table :users, id: :uuid do |t|
-      t.uuid :user_idx
+      t.uuid :user_idx, null: false
       t.string :name
-      t.integer :status, default: 0
+      t.integer :status, default: 1
 
       t.timestamps
     end

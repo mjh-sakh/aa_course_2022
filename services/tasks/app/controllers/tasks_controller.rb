@@ -25,24 +25,26 @@ class TasksController < ApplicationController
     @new_task = Task.new(description: params['description'],
                          user: random_popug)
 
-    return unless @new_task.save
-
-    message = {
-      message_name: 'TaskCreated',
-      data: {
-        task_id: @new_task.id,
-        description: @new_task.description,
-        user_id: @new_task.assignee.user_idx,
-        timestamp: Time.now.utc
+    if @new_task.save
+      message = {
+        message_name: 'TaskCreated',
+        data: {
+          task_id: @new_task.id,
+          description: @new_task.description,
+          assignee_id: @new_task.assignee.user_idx,
+          timestamp: Time.now.utc
+        }
       }
-    }
 
-    Producer.new.publish(
-      message,
-      topic: TASKS_TOPIC_BE
-    )
+      Producer.new.publish(
+        message,
+        topic: TASKS_TOPIC_BE
+      )
 
-    redirect_to action: 'index'
+      redirect_to action: 'index'
+    else
+      redirect_to root_path, alert: 'Error'
+    end
   end
 
   def shuffle
@@ -65,7 +67,7 @@ class TasksController < ApplicationController
           data: {
             task_id: task.id,
             description: task.description,
-            user_id: task.assignee.user_idx,
+            assignee_id: task.assignee.user_idx,
             timestamp: Time.now.utc
           }
         }
@@ -93,7 +95,7 @@ class TasksController < ApplicationController
         description: task.description,
         assignee_id: task.assignee.user_idx,
         completed_by_id: current_user.user_idx, # i.e. can be closed by admin
-        completed_at: task.completed_at
+        timestamp: task.completed_at
       }
     }
 

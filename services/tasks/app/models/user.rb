@@ -10,6 +10,7 @@ class User < ApplicationRecord
   enum status: { deactivated: 0, active: 1 }
 
   has_and_belongs_to_many :roles
+  has_many :tasks
 
   def permissions
     return [] unless roles
@@ -23,8 +24,9 @@ end
 # Table name: users
 #
 #  id         :uuid             not null, primary key
-#  user_idx   :uuid
+#  user_idx   :uuid             not null
 #  name       :string
+#  status     :integer          default("active")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

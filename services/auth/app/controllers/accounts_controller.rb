@@ -1,9 +1,10 @@
 class AccountsController < ApplicationController
   ACCOUNTS_TOPIC_CUD = 'aa_accounts_stream'
-  
-  before_action :set_account, only: [:show, :edit, :update, :destroy, :enable]
+  ACCOUNTS_TOPIC_BE = 'aa_accounts_lifecycle'
 
-  before_action :authenticate_account!, only: [:index]
+  before_action :set_account, only: [:edit, :update, :destroy, :enable]
+
+  before_action :authenticate_account!, except: [:current]
 
   # GET /accounts
   # GET /accounts.json
@@ -12,6 +13,7 @@ class AccountsController < ApplicationController
   end
 
   # GET /accounts/current.json
+  # used by other services to get data per the strategy
   def current
     render json: current_account.to_json
   end
@@ -29,7 +31,6 @@ class AccountsController < ApplicationController
       if @account.update(account_params)
         # ----------------------------- produce event -----------------------
         message = {
-          # **account_event_data,
           message_name: 'AccountUpdated',
           data: {
             id: @account.id,
@@ -46,11 +47,9 @@ class AccountsController < ApplicationController
 
         # --------------------------------------------------------------------
 
-        format.html { redirect_to root_path, notice: 'Account was successfully updated.' }
-        format.json { render :index, status: :ok, location: @account }
+        redirect_to root_path, notice: 'Account was successfully updated.'
       else
-        format.html { render :edit }
-        format.json { render json: @account.errors, status: :unprocessable_entity }
+        render :edit
       end
     end
   end
@@ -63,7 +62,6 @@ class AccountsController < ApplicationController
 
     # ----------------------------- produce event -----------------------
     message = {
-      # **account_event_data,
       type: 'AccountDeleted',
       data: { id: @account.id }
     }
@@ -71,8 +69,7 @@ class AccountsController < ApplicationController
     # --------------------------------------------------------------------
 
     respond_to do |format|
-      format.html { redirect_to root_path, notice: 'Account was successfully destroyed.' }
-      format.json { head :no_content }
+      redirect_to root_path, notice: 'Account was successfully destroyed.'
     end
   end
 
@@ -83,7 +80,6 @@ class AccountsController < ApplicationController
 
     # ----------------------------- produce event -----------------------
     message = {
-      # **account_event_data,
       type: 'AccountEnabled',
       data: { id: @account.id }
     }
@@ -116,23 +112,19 @@ class AccountsController < ApplicationController
     end
   end
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_account
     @account = Account.find(params[:id])
   end
 
-  # Only allow a list of trusted parameters through.
   def account_params
     params.require(:account).permit(:full_name, :role)
   end
 
   def produce_business_event(id, role)
     message = {
-      # **account_event_data,
       type: 'AccountRoleChanged',
       data: { id: id, role: role }
     }
-    Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
-    # end
+    Producer.new.publish(message, topic: ACCOUNTS_TOPIC_BE)
   end
 end
