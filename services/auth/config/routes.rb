@@ -12,4 +12,7 @@ Rails.application.routes.draw do
   patch '/accounts/:id', to: 'accounts#update'
   get '/accounts/current', to: 'accounts#current'
   get '/accounts/sign_out', to: 'accounts#sign_in'
+  get '/accounts/resend_all_active_accounts',
+      to: 'accounts#resend_all_active_accounts',
+      as: :resend_data
 end

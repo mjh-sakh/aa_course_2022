@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_18_041030) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_16_024157) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -43,20 +43,41 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_18_041030) do
   end
 
   create_table "tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "task_idx", null: false
     t.string "description", null: false
     t.uuid "user_id"
     t.integer "status", default: 0
     t.datetime "completed_at", precision: nil
+    t.float "cost"
+    t.float "reward"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "jira_id"
+    t.index ["task_idx"], name: "index_tasks_on_task_idx", unique: true
     t.index ["user_id"], name: "index_tasks_on_user_id"
+  end
+
+  create_table "transaction_log_records", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.datetime "event_time", precision: nil, null: false
+    t.datetime "record_time", precision: nil, null: false
+    t.float "amount", null: false
+    t.integer "record_type", null: false
+    t.uuid "reference_id"
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_time"], name: "index_transaction_log_records_on_record_time", using: :brin
+    t.index ["record_type"], name: "index_transaction_log_records_on_record_type"
+    t.index ["user_id"], name: "index_transaction_log_records_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_idx", null: false
     t.string "name"
+    t.string "email"
     t.integer "status", default: 1
+    t.float "balance"
+    t.datetime "balance_update_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_idx"], name: "index_users_on_user_idx", unique: true
