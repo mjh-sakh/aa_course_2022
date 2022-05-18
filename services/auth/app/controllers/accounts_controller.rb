@@ -87,9 +87,28 @@ class AccountsController < ApplicationController
     # --------------------------------------------------------------------
 
     respond_to do |format|
-      format.html { redirect_to root_path, notice: 'Account was successfully enabled.' }
-      format.json { head :no_content }
+      redirect_to root_path, notice: 'Account was successfully enabled.'
     end
+  end
+
+  def resend_all_active_accounts
+    count = 0
+    Account.where(active: true).each do |account|
+      message = {
+        message_name: 'AccountUpdated',
+        data: {
+          id: account.id,
+          email: account.email,
+          full_name: account.full_name,
+          position: account.position,
+          role: account.role
+        }
+      }
+      Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
+      count += 1
+    end
+
+    redirect_to root_path, notice: "Information about #{count} active accounts was resent."
   end
 
   private

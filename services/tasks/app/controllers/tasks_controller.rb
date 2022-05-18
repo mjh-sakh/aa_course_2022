@@ -107,6 +107,30 @@ class TasksController < ApplicationController
     redirect_to action: 'index'
   end
 
+  def resend_all_tasks
+    count = 0
+    Task.includes(:user).all.each do |task|
+      count += 1
+      message = {
+        message_name: 'TaskUpdated',
+        data: {
+          task_id: task.id,
+          description: task.description,
+          assignee_id: task.assignee.user_idx,
+          status: task.status,
+          timestamp: task.completed_at
+        }
+      }
+
+      ::Producer.new.publish(
+        message,
+        topic: TASKS_TOPIC_CUD
+      )
+    end
+
+    redirect_to root_path, notice: "Information about #{count} task(s) was resent."
+  end
+
   private
 
   def random_popug

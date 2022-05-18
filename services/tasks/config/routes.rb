@@ -13,4 +13,7 @@ Rails.application.routes.draw do
   patch '/shuffle', to: 'tasks#shuffle'
   patch '/task/:id', to: 'tasks#complete'
   get '/login', to: 'tasks#login'
+  get '/tasks/resend_all_tasks',
+      to: 'tasks#resend_all_tasks',
+      as: :resend_data
 end
