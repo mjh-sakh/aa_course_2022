@@ -3,8 +3,11 @@
 class UsersUpdateWorker
   include Sneakers::Worker
 
+  class UnsupportedMessageError < StandardError; end
+
   MAX_RETRY = 5
   QUEUE_NAME = :users_updates
+  SUPPORTED_MESSAGE_VERSIONS = [2].freeze
 
   from_queue(
     QUEUE_NAME,
@@ -24,8 +27,16 @@ class UsersUpdateWorker
     logger.info metadata
 
     message = parse(message)
+
+    raise UnsupportedMessageError unless SUPPORTED_MESSAGE_VERSIONS.include? message['message_version']
+
     ::UserUpserter.new(message).upsert!
 
+    ack!
+
+  rescue UnsupportedMessageError => e
+    logger.error "Worker supports only message versions #{SUPPORTED_MESSAGE_VERSIONS.join(', ')}, but '#{message['message_version']}' come. Ack with no action."
+    logger.error message
     ack!
   end
 

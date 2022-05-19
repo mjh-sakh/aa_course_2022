@@ -9,19 +9,23 @@ class Accounts::RegistrationsController < Devise::RegistrationsController
 
     # ----------------------------- produce event -----------------------
     message = {
-      # event_id: SecureRandom.uuid,
-      # event_version: 1,
-      # event_time: Time.now.to_s,
-      # producer: 'auth_service',
       message_name: 'AccountCreated',
+      message_version: 2,
+      message_time: Time.now,
+      producer: 'auth_service',
       data: {
-        id: resource.id,
+        id: @account.id,  # left for forward compatibility
+        account_id: resource.id,
         email: resource.email,
         full_name: resource.full_name,
         position: resource.position,
         role: resource.role
       }
     }
+
+    # TODO: remove forward compatibility when v1 is not in use
+    SchemaValidator.new(message, :AccountUpdated_v1).validate! # for Accounting
+    SchemaValidator.new(message, :AccountCreated_v2).validate! # for Tasks
     Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
     # --------------------------------------------------------------------
   end

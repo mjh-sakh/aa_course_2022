@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_16_024157) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_18_104507) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,6 +52,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_16_024157) do
     t.float "reward"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "jira_id"
     t.index ["task_idx"], name: "index_tasks_on_task_idx", unique: true
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end

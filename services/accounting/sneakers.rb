@@ -21,3 +21,4 @@ Sneakers.configure(
 require_relative 'app/workers/users_update_worker'
 require_relative 'app/workers/tasks_payments_worker'
 require_relative 'app/workers/tasks_update_worker'
+require_relative 'app/workers/daily_report_worker'

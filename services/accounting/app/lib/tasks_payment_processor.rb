@@ -36,6 +36,7 @@ class TasksPaymentProcessor
     worker = User.find_or_create_by(user_idx: @data['assignee_id'])
     task = Task.new(
       task_idx: @data['task_id'],
+      jira_id: @data['jira_id'],
       description: @data['description'],
       user_id: worker.id,
       status: :open

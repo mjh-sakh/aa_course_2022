@@ -12,7 +12,8 @@
           <span class="input-group-btn">
             <button class="btn btn-warning" type="submit">Add new task</button>
           </span>
-            <input class="form-control" type="text" placeholder="Task description" name="<%= :description %>" id="<%= :description %>">
+          <input class="form-control" type="text" placeholder="Jira ID" name="<%= :jira_id %>" id="<%= :jira_id %>">
+          <input class="form-control" type="text" placeholder="Task description" name="<%= :description %>" id="<%= :description %>">
         </div>
       </div>
     <% end %>
@@ -29,6 +30,7 @@
     <thead>
     <tr>
       <th scope="col">#</th>
+      <th scope="col">Jira ID</th>
       <th scope="col">Task Description</th>
       <th scope="col">Assignee</th>
       <th scope="col">Action</th>
@@ -39,6 +41,7 @@
       <% if (@permissions.include? 'view_own_tasks' and task.assignee == current_user) or @permissions.include? 'view_all_tasks' %>
         <tr>
           <th scope="row"><%= i + 1 %></th>
+          <td><%= task.jira_id %></td>
           <td><%= task.description %></td>
           <td><%= task.assignee.name %></td>
           <td>

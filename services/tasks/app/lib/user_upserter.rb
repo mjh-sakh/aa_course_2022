@@ -33,7 +33,7 @@ class UserUpserter
 
   def create_user!
     user = User.new(
-      user_idx: @data[:id],
+      user_idx: @data[:account_id],
       name: @data[:full_name],
       status: :active
     )
@@ -47,7 +47,7 @@ class UserUpserter
   end
 
   def update_user!
-    user = User.find_by(user_idx: @data[:id])
+    user = User.find_by(user_idx: @data[:account_id])
 
     if user.nil?
       @logger.info "User #{@data[:full_name]} is new but updated; user will be created."
@@ -67,9 +67,9 @@ class UserUpserter
   end
 
   def deactivate_user!
-    user = User.find_by(user_idx: @data[:id])
+    user = User.find_by(user_idx: @data[:account_id])
     if user.nil?
-      @logger.info "User with id: #{@data[:id]} is not found; Ignored."
+      @logger.info "User with id: #{@data[:account_id]} is not found; Ignored."
     else
       ActiveRecord::Base.transaction do
         user.status = :deactivated
@@ -81,9 +81,9 @@ class UserUpserter
   end
 
   def activate_user!
-    user = User.find_by(user_idx: @data[:id])
+    user = User.find_by(user_idx: @data[:account_id])
     if user.nil?
-      @logger.info "User with id: #{@data[:id]} is not found; Ignored."
+      @logger.info "User with id: #{@data[:account_id]} is not found; Ignored."
     else
       user.update(status: :active)
       @logger.info "User #{user.name} activated."
