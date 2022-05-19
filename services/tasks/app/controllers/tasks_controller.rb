@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class TasksController < ApplicationController
+
+  class MessageWasNotPublished < StandardError; end
+
   # 'aa' stands for 'Async Architecture' course name
   TASKS_TOPIC_CUD = 'aa_tasks_stream'
   TASKS_TOPIC_BE = 'aa_tasks_lifecycle'
@@ -22,25 +25,33 @@ class TasksController < ApplicationController
   def create
     return unless @permissions.include? 'add_new_task'
 
-    @new_task = Task.new(description: params['description'],
+    @new_task = Task.new(jira_id: params['jira_id'],
+                         description: params['description'],
                          user: random_popug)
 
     if @new_task.save
       message = {
         message_name: 'TaskCreated',
+        message_version: 2,
+        message_time: Time.now,
+        producer: 'task_service',
         data: {
           task_id: @new_task.id,
+          jira_id: @new_task.jira_id,
           description: @new_task.description,
           assignee_id: @new_task.assignee.user_idx,
           timestamp: Time.now.utc
         }
       }
 
-      Producer.new.publish(
-        message,
-        topic: TASKS_TOPIC_BE
-      )
-
+      begin
+        SchemaValidator.new(message, :TaskCreated_v2).validate!
+        Producer.new.publish(message, topic: TASKS_TOPIC_BE)
+      rescue
+        logger.warn "Error occurred when publishing tasks BE"
+        logger.warn message
+        logger.warn [MessageWasNotPublished, $!.to_s, $!.backtrace]
+      end
       redirect_to action: 'index'
     else
       redirect_to root_path, alert: 'Error'
@@ -64,8 +75,12 @@ class TasksController < ApplicationController
 
         messages << {
           message_name: 'TaskAssigned',
+          message_version: 2,
+          message_time: Time.now,
+          producer: 'task_service',
           data: {
             task_id: task.id,
+            jira_id: task.jira_id,
             description: task.description,
             assignee_id: task.assignee.user_idx,
             timestamp: Time.now.utc
@@ -74,7 +89,14 @@ class TasksController < ApplicationController
       end
     end
 
-    messages.each { |message| ::Producer.new.publish(message, topic: TASKS_TOPIC_BE) }
+    messages.each do |message|
+      SchemaValidator.new(message, :TaskAssigned_v2).validate!
+      Producer.new.publish(message, topic: TASKS_TOPIC_BE)
+    rescue
+      logger.warn "Error occurred when publishing tasks BE"
+      logger.warn message
+      logger.warn [MessageWasNotPublished, $!.to_s, $!.backtrace]
+    end
 
     redirect_to action: 'index'
   end
@@ -90,20 +112,26 @@ class TasksController < ApplicationController
 
     message = {
       message_name: 'TaskCompleted',
+      message_version: 2,
+      message_time: Time.now,
+      producer: 'task_service',
       data: {
         task_id: task.id,
+        jira_id: task.jira_id,
         description: task.description,
         assignee_id: task.assignee.user_idx,
         completed_by_id: current_user.user_idx, # i.e. can be closed by admin
         timestamp: task.completed_at
       }
     }
-
-    ::Producer.new.publish(
-      message,
-      topic: TASKS_TOPIC_BE
-    )
-
+    begin
+      SchemaValidator.new(message, :TaskCompleted_v2).validate!
+      Producer.new.publish(message, topic: TASKS_TOPIC_BE)
+    rescue
+      logger.warn "Error occurred when publishing tasks BE"
+      logger.warn message
+      logger.warn [MessageWasNotPublished, $!.to_s, $!.backtrace]
+    end
     redirect_to action: 'index'
   end
 
@@ -113,19 +141,26 @@ class TasksController < ApplicationController
       count += 1
       message = {
         message_name: 'TaskUpdated',
+        message_version: 2,
+        message_time: Time.now,
+        producer: 'task_service',
         data: {
           task_id: task.id,
+          jira_id: task.jira_id,
           description: task.description,
           assignee_id: task.assignee.user_idx,
           status: task.status,
           timestamp: task.completed_at
         }
       }
-
-      ::Producer.new.publish(
-        message,
-        topic: TASKS_TOPIC_CUD
-      )
+      begin
+        SchemaValidator.new(message, :TaskUpdated_v2).validate!
+        Producer.new.publish(message, topic: TASKS_TOPIC_CUD)
+      rescue
+        logger.warn "Error occurred when publishing tasks CUD message"
+        logger.warn message
+        logger.warn [MessageWasNotPublished, $!.to_s, $!.backtrace]
+      end
     end
 
     redirect_to root_path, notice: "Information about #{count} task(s) was resent."

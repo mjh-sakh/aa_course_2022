@@ -12,6 +12,8 @@ module Services
     config.autoload_paths << Rails.root.join('lib')
     config.load_defaults 7.0
 
+    require_relative '../../SchemaRegistry/schema_validator'
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

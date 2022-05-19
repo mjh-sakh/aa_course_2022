@@ -15,6 +15,7 @@
         <th scope="col">#</th>
         <th scope="col">Record time</th>
         <th scope="col">Event time</th>
+        <th scope="col">Jira ID</th>
         <th scope="col">Task description</th>
         <th scope="col">Amount</th>
         <th scope="col">Assignee</th>
@@ -27,6 +28,7 @@
           <th scope="row"><%= i+1 %></th>
           <td><%= record.record_time %></td>
           <td><%= record.event_time %></td>
+          <td><%= record&.task&.jira_id %></td>
           <td><%= record&.task&.description %></td>
           <td><%= -record.amount %></td>
           <td><%= record.user.name %></td>

@@ -5,6 +5,7 @@ class TasksUpdateWorker
 
   MAX_RETRY = 5
   QUEUE_NAME = :tasks_updates_by_accounting
+  SUPPORTED_MESSAGE_VERSIONS = [2].freeze
 
   from_queue(
     QUEUE_NAME,
@@ -24,8 +25,16 @@ class TasksUpdateWorker
     logger.info metadata
 
     message = parse(message)
+
+    raise UnsupportedMessageError unless SUPPORTED_MESSAGE_VERSIONS.include? message['message_version']
+
     ::TaskUpserter.new(message).upsert!
 
+    ack!
+
+  rescue UnsupportedMessageError => e
+    logger.error "Worker supports only message versions #{SUPPORTED_MESSAGE_VERSIONS.join(', ')}, but '#{message['message_version']}' come. Ack with no action."
+    logger.error message
     ack!
   end
 

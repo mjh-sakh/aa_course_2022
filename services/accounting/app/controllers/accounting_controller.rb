@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AccountingController < ApplicationController
+  # 'aa' stands for 'Async Architecture' course name
+  ACCOUNTING_TOPIC_BE = 'aa_accounting_lifecycle'
 
   before_action :authenticate_user!, except: :login
   before_action do
@@ -35,8 +37,8 @@ class AccountingController < ApplicationController
   end
 
   def calc_and_make_payment
-    DayPaymentProcessor.new.process!
+    Producer.new.publish({ command: :start }, topic: ACCOUNTING_TOPIC_BE)
 
-    redirect_to root_path, notice: 'Payment processed successfully'
+    redirect_to root_path, notice: 'Payment process started'
   end
 end

@@ -8,6 +8,7 @@ class Task < ApplicationRecord
 
   validates :description, presence: true
   validates :status, presence: true
+  validates :description, format: { without: /\[.+\]/ }
 
   alias_attribute :assignee, :user
 end
@@ -23,4 +24,5 @@ end
 #  completed_at :datetime
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  jira_id      :string
 #

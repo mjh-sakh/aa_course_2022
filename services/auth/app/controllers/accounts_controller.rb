@@ -32,14 +32,22 @@ class AccountsController < ApplicationController
         # ----------------------------- produce event -----------------------
         message = {
           message_name: 'AccountUpdated',
+          message_version: 2,
+          message_time: Time.now,
+          producer: 'auth_service',
           data: {
-            id: @account.id,
+            id: @account.id,  # left for forward compatibility
+            account_id: @account.id,
             email: @account.email,
             full_name: @account.full_name,
             position: @account.position,
             role: @account.role
           }
         }
+
+        # TODO: remove forward compatibility when v1 is not in use
+        SchemaValidator.new(message, :AccountUpdated_v1).validate! # for Accounting
+        SchemaValidator.new(message, :AccountUpdated_v2).validate! # for Tasks
         Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
         # --------------------------------------------------------------------
 
@@ -96,14 +104,22 @@ class AccountsController < ApplicationController
     Account.where(active: true).each do |account|
       message = {
         message_name: 'AccountUpdated',
+        message_version: 2,
+        message_time: Time.now,
+        producer: 'auth_service',
         data: {
-          id: account.id,
+          id: account.id,  # left for forward compatibility
+          account_id: account.id,
           email: account.email,
           full_name: account.full_name,
           position: account.position,
           role: account.role
         }
       }
+
+      # TODO: remove forward compatibility when v1 is not in use
+      SchemaValidator.new(message, :AccountUpdated_v1).validate! # for Accounting
+      SchemaValidator.new(message, :AccountUpdated_v2).validate! # for Tasks
       Producer.new.publish(message, topic: ACCOUNTS_TOPIC_CUD)
       count += 1
     end
@@ -112,16 +128,6 @@ class AccountsController < ApplicationController
   end
 
   private
-
-  # save it for future, not in use for week 1
-  def account_event_data
-    {
-      event_id: SecureRandom.uuid,
-      event_version: 1,
-      event_time: Time.now.to_s,
-      producer: 'aa_auth_service',
-    }
-  end
 
   def current_account
     if doorkeeper_token

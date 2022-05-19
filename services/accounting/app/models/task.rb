@@ -24,4 +24,5 @@ end
 #  reward       :float
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  jira_id      :string
 #

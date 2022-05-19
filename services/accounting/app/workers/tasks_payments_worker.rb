@@ -3,8 +3,12 @@
 class TasksPaymentsWorker
   include Sneakers::Worker
 
+  class UnsupportedMessageError < StandardError; end
+  class BusinessEventWasNotProcessed < StandardError; end
+
   MAX_RETRY = 5
   QUEUE_NAME = :tasks_processing_by_accounting
+  SUPPORTED_MESSAGE_VERSIONS = [2].freeze
 
   from_queue(
     QUEUE_NAME,
@@ -24,9 +28,22 @@ class TasksPaymentsWorker
     logger.info metadata
 
     message = parse(message)
-    ::TasksPaymentProcessor.new(message).process!
 
+    raise UnsupportedMessageError unless SUPPORTED_MESSAGE_VERSIONS.include? message['message_version']
+
+    TasksPaymentProcessor.new(message).process!
     ack!
+
+  rescue UnsupportedMessageError
+    logger.error "Worker supports only message versions #{SUPPORTED_MESSAGE_VERSIONS.join(', ')}, but '#{message['message_version']}' come. Ack with no action."
+    logger.error message
+    logger.error [UnsupportedMessageError, $!.to_s, $!.backtrace]
+    ack!
+  rescue StandardError
+    logger.error "BE was not processed properly."
+    logger.error message
+    logger.error [BusinessEventWasNotProcessed, $!.to_s, $!.backtrace]
+    reject!
   end
 
   private
