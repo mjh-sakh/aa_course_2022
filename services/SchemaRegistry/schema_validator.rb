@@ -17,8 +17,6 @@ require_relative 'task_schemas'
 require_relative 'auth_schemas'
 
 class SchemaValidator
-  include TaskSchemas
-  include AuthSchemas
 
   def initialize(message, schema_name)
     @message = message
@@ -76,12 +74,7 @@ class SchemaValidator
   end
 
   # ---- schema definitions goes here ----
-
-  def check_meta_data(version = Integer, producer = String, name = String)
-    t :message_version, version
-    t :message_name, name
-    t :message_time, Time
-    t :producer, producer
-  end
+  include TaskSchemas
+  include AuthSchemas
 
 end

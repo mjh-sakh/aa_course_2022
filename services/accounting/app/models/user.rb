@@ -2,10 +2,6 @@
 
 # a User
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  # devise :database_authenticatable, :registerable,
-  #        :recoverable, :rememberable, :validatable
   devise :omniauthable, omniauth_providers: %i[aa_auth]
   enum status: { deactivated: 0, active: 1 }
 
@@ -24,13 +20,12 @@ end
 #
 # Table name: users
 #
-#  id                  :uuid             not null, primary key
-#  user_idx            :uuid             not null
-#  name                :string
-#  email               :string
-#  status              :integer          default("active")
-#  balance             :float
-#  balance_update_time :datetime
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
+#  id         :uuid             not null, primary key
+#  user_idx   :uuid             not null
+#  name       :string
+#  email      :string
+#  status     :integer          default("active")
+#  balance    :float
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #

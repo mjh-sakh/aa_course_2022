@@ -31,13 +31,13 @@ class AccountsController < ApplicationController
       if @account.update(account_params)
         # ----------------------------- produce event -----------------------
         message = {
-          message_name: 'AccountUpdated',
+          event_name: 'AccountUpdated',
           message_version: 2,
           message_time: Time.now,
           producer: 'auth_service',
           data: {
             id: @account.id,  # left for forward compatibility
-            account_id: @account.id,
+            account_public_id: @account.id,
             email: @account.email,
             full_name: @account.full_name,
             position: @account.position,
@@ -103,13 +103,13 @@ class AccountsController < ApplicationController
     count = 0
     Account.where(active: true).each do |account|
       message = {
-        message_name: 'AccountUpdated',
+        event_name: 'AccountUpdated',
         message_version: 2,
         message_time: Time.now,
         producer: 'auth_service',
         data: {
           id: account.id,  # left for forward compatibility
-          account_id: account.id,
+          account_public_id: account.id,
           email: account.email,
           full_name: account.full_name,
           position: account.position,

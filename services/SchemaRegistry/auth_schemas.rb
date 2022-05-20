@@ -3,7 +3,7 @@
 module AuthSchemas
 
   def AccountCreated_v1
-    t :message_name, 'AccountCreated'
+    t :event_name, 'AccountCreated'
     @subject = t :data, Hash
     t :id, method(:uuid?)
     t :email, String
@@ -13,7 +13,7 @@ module AuthSchemas
   end
 
   def AccountUpdated_v1
-    t :message_name, 'AccountUpdated'
+    t :event_name, 'AccountUpdated'
     @subject = t :data, Hash
     t :id, method(:uuid?)
     t :email, String
@@ -23,7 +23,7 @@ module AuthSchemas
   end
 
   def AccountDeleted_v1
-    t :message_name, 'AccountDeleted'
+    t :event_name, 'AccountDeleted'
     @subject = t :data, Hash
     t :id, method(:uuid?)
   end
@@ -31,9 +31,12 @@ module AuthSchemas
   # --- V2 ----
 
   def AccountCreated_v2
-    check_meta_data 2, 'auth_service', 'AccountCreated'
+    t :message_version, 2
+    t :event_name, 'AccountCreated'
+    t :message_time, Time
+    t :producer, 'auth_service'
     @subject = t :data, Hash
-    t :account_id, method(:uuid?)
+    t :account_public_id, method(:uuid?)
     t :email, String
     t :full_name, optional(String)
     t :position, optional(String)
@@ -41,9 +44,12 @@ module AuthSchemas
   end
 
   def AccountUpdated_v2
-    check_meta_data 2, 'auth_service', 'AccountUpdated'
+    t :message_version, 2
+    t :event_name, 'AccountUpdated'
+    t :message_time, Time
+    t :producer, 'auth_service'
     @subject = t :data, Hash
-    t :account_id, method(:uuid?)
+    t :account_public_id, method(:uuid?)
     t :email, String
     t :full_name, optional(String)
     t :position, optional(String)
@@ -51,8 +57,11 @@ module AuthSchemas
   end
 
   def AccountDeleted_v2
-    check_meta_data 2, 'auth_service', 'AccountDeleted'
+    t :message_version, 2
+    t :event_name, 'AccountDeleted'
+    t :message_time, Time
+    t :producer, 'auth_service'
     @subject = t :data, Hash
-    t :account_id, method(:uuid?)
+    t :account_public_id, method(:uuid?)
   end
 end
