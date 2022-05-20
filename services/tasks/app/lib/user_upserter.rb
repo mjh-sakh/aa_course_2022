@@ -11,13 +11,13 @@ class UserUpserter
   #   }
   # }
   def initialize(message)
-    @message_name = message['message_name']
+    @event_name = message['event_name']
     @data = message['data']
     @logger = ActiveSupport::Logger.new(STDOUT)
   end
 
   def upsert!
-    case @message_name
+    case @event_name
     when 'AccountCreated'
       create_user!
     when 'AccountUpdated'
@@ -27,13 +27,13 @@ class UserUpserter
     when 'AccountEnabled'
       activate_user!
     else
-      @logger.info "Ignoring '#{@message_name}' message."
+      @logger.info "Ignoring '#{@event_name}' message."
     end
   end
 
   def create_user!
     user = User.new(
-      user_idx: @data[:account_id],
+      user_idx: @data[:account_public_id],
       name: @data[:full_name],
       status: :active
     )
@@ -47,7 +47,7 @@ class UserUpserter
   end
 
   def update_user!
-    user = User.find_by(user_idx: @data[:account_id])
+    user = User.find_by(user_idx: @data[:account_public_id])
 
     if user.nil?
       @logger.info "User #{@data[:full_name]} is new but updated; user will be created."
@@ -62,14 +62,14 @@ class UserUpserter
       end
       @logger.info "User #{user.name} updated."
     else
-      @logger.info "Ignoring '#{@message_name}' message for user #{user.name} as not active."
+      @logger.info "Ignoring '#{@event_name}' message for user #{user.name} as not active."
     end
   end
 
   def deactivate_user!
-    user = User.find_by(user_idx: @data[:account_id])
+    user = User.find_by(user_idx: @data[:account_public_id])
     if user.nil?
-      @logger.info "User with id: #{@data[:account_id]} is not found; Ignored."
+      @logger.info "User with id: #{@data[:account_public_id]} is not found; Ignored."
     else
       ActiveRecord::Base.transaction do
         user.status = :deactivated
@@ -81,9 +81,9 @@ class UserUpserter
   end
 
   def activate_user!
-    user = User.find_by(user_idx: @data[:account_id])
+    user = User.find_by(user_idx: @data[:account_public_id])
     if user.nil?
-      @logger.info "User with id: #{@data[:account_id]} is not found; Ignored."
+      @logger.info "User with id: #{@data[:account_public_id]} is not found; Ignored."
     else
       user.update(status: :active)
       @logger.info "User #{user.name} activated."

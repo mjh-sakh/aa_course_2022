@@ -11,13 +11,13 @@ class UserUpserter
   #   }
   # }
   def initialize(message)
-    @message_name = message['message_name']
+    @event_name = message['event_name']
     @data = message['data']
     @logger = ActiveSupport::Logger.new(STDOUT)
   end
 
   def upsert!
-    case @message_name
+    case @event_name
     when 'AccountCreated'
       create_user!
     when 'AccountUpdated'
@@ -27,7 +27,7 @@ class UserUpserter
     when 'AccountEnabled'
       activate_user!
     else
-      @logger.info "Ignoring '#{@message_name}' message."
+      @logger.info "Ignoring '#{@event_name}' message."
     end
   end
 
@@ -62,7 +62,7 @@ class UserUpserter
       end
       @logger.info "User #{user.name} updated."
     else
-      @logger.info "Ignoring '#{@message_name}' message for user #{user.name} as not active."
+      @logger.info "Ignoring '#{@event_name}' message for user #{user.name} as not active."
     end
   end
 
